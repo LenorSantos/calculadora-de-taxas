@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador de Taxas</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      /* slate-900 */
+      --panel: #111827;
+      /* gray-900 */
+      --text: #e5e7eb;
+      /* gray-200 */
+      --muted: #94a3b8;
+      /* slate-400 */
+      --accent: #22c55e;
+      /* green-500 */
+      --danger: #ef4444;
+      /* red-500 */
+      --warn: #f59e0b;
+      /* amber-500 */
+      --border: #1f2937;
+      /* gray-800 */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(135deg, #0b1022, #0b122a 45%, #0e1a35);
+      color: var(--text);
+    }
+
+    header {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, .9);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: .3px;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #fff;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card .body {
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0b1222;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: #334155;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .25);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row>div {
+      display: grid;
+      gap: 6px;
+    }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .switch input {
+      appearance: none;
+      width: 40px;
+      height: 22px;
+      background: #111827;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .switch input:checked {
+      background: #16a34a;
+      border-color: #14532d;
+    }
+
+    .switch input::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      transition: .2s;
+    }
+
+    .switch input:checked::after {
+      transform: translateX(18px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    thead th {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    tfoot td {
+      font-weight: 700;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: #0a1328;
+    }
+
+    .pill.ok {
+      color: var(--accent);
+      border-color: #14532d;
+      background: rgba(34, 197, 94, .08);
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      border-color: #7c2d12;
+      background: rgba(245, 158, 11, .1);
+    }
+
+    .pill.danger {
+      color: var(--danger);
+      border-color: #7f1d1d;
+      background: rgba(239, 68, 68, .1);
+    }
+
+    .flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .spacer {
+      height: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Simulador de Taxas – SumUp (D+0 vs D+1) (é focado na SumUp)</h1>
+  </header>
+
+  <div class="wrap">
+    <section class="card">
+      <h2>Entradas</h2>
+      <div class="body">
+        <div class="grid-2">
+          <div>
+            <label>Total de vendas (contagem)</label>
+            <input id="totalCount" type="number" step="1" min="0" value="400" />
+          </div>
+          <div>
+            <label>Faturamento total (R$)</label>
+            <input id="totalGross" type="text" value="20000,00" />
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label>Vendas PIX (qtd)</label>
+            <input id="pixCount" type="number" step="1" min="0" value="250" />
+          </div>
+          <div>
+            <label>Vendas Débito (qtd)</label>
+            <input id="debitCount" type="number" step="1" min="0" value="100" />
+          </div>
+          <div>
+            <label>Vendas Crédito (qtd)</label>
+            <input id="creditCount" type="number" step="1" min="0" value="50" />
+          </div>
+        </div>
+
+        <div class="flex">
+          <label class="switch">
+            <input id="manualTotals" type="checkbox" />
+            <span>Editar <b>valores por método</b> manualmente</span>
+          </label>
+          <span class="muted">(desmarcado: os valores por método são proporcionais ao ticket médio)</span>
+        </div>
+
+        <div id="totalsRow" class="grid-3" style="display:none;">
+          <div>
+            <label>Valor PIX (R$)</label>
+            <input id="pixGross" type="text" value="" />
+          </div>
+          <div>
+            <label>Valor Débito (R$)</label>
+            <input id="debitGross" type="text" value="" />
+          </div>
+          <div>
+            <label>Valor Crédito (R$)</label>
+            <input id="creditGross" type="text" value="" />
+          </div>
+        </div>
+
+        <div class="card" style="background:#0b1222; border-color:#0b1222;">
+          <h2>Taxas (%)</h2>
+          <div class="body">
+            <div class="row">
+              <div>
+                <label>D+0 PIX</label>
+                <input id="d0Pix" type="number" step="0.01" min="0" value="0" />
+              </div>
+              <div>
+                <label>D+0 Débito</label>
+                <input id="d0Debit" type="number" step="0.01" min="0" value="1.60" />
+              </div>
+              <div>
+                <label>D+0 Crédito (1x)</label>
+                <input id="d0Credit" type="number" step="0.01" min="0" value="4.09" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>D+1 PIX</label>
+                <input id="d1Pix" type="number" step="0.01" min="0" value="0" />
+              </div>
+              <div>
+                <label>D+1 Débito</label>
+                <input id="d1Debit" type="number" step="0.01" min="0" value="1.29" />
+              </div>
+              <div>
+                <label>D+1 Crédito (1x)</label>
+                <input id="d1Credit" type="number" step="0.01" min="0" value="3.99" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex" id="checks"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Resultados</h2>
+      <div class="body">
+        <div id="summary" class="flex"></div>
+        <div class="spacer"></div>
+        <div id="tables"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const el = id => document.getElementById(id);
+
+    // Para valores monetários (aceita "20.000,00")
+    const nMoney = v => Number(String(v).replace(/\./g, '').replace(',', '.')) || 0;
+
+    // Para taxas (aceita "4,09" ou "4.09")
+    const nRate = v => Number(String(v).replace(',', '.')) || 0;
+
+    const money = v => (new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })).format(v);
+    const pct = v => `${(v ?? 0).toFixed(2)}%`;
+
+    const inputs = [
+      'totalCount', 'totalGross',
+      'pixCount', 'debitCount', 'creditCount',
+      'manualTotals', 'pixGross', 'debitGross', 'creditGross',
+      'd0Pix', 'd0Debit', 'd0Credit',
+      'd1Pix', 'd1Debit', 'd1Credit'
+    ];
+
+    inputs.forEach(k => el(k).addEventListener('input', compute));
+    el('manualTotals').addEventListener('change', () => {
+      el('totalsRow').style.display = el('manualTotals').checked ? 'grid' : 'none';
+      compute();
+    });
+
+    function compute() {
+      const totalCount = Math.max(0, Math.floor(nMoney(el('totalCount').value)));
+      const totalGross = nMoney(el('totalGross').value);
+
+      const counts = {
+        pix: Math.max(0, Math.floor(nMoney(el('pixCount').value))),
+        debit: Math.max(0, Math.floor(nMoney(el('debitCount').value))),
+        credit: Math.max(0, Math.floor(nMoney(el('creditCount').value)))
+      };
+      const countsSum = counts.pix + counts.debit + counts.credit;
+
+      // Totais por método
+      let totals;
+      if (el('manualTotals').checked) {
+        totals = {
+          pix: nMoney(el('pixGross').value),
+          debit: nMoney(el('debitGross').value),
+          credit: nMoney(el('creditGross').value)
+        };
+      } else {
+        const ticket = totalCount > 0 ? totalGross / totalCount : 0;
+        totals = {
+          pix: counts.pix * ticket,
+          debit: counts.debit * ticket,
+          credit: counts.credit * ticket
+        };
+        el('pixGross').value = formatNumber(totals.pix);
+        el('debitGross').value = formatNumber(totals.debit);
+        el('creditGross').value = formatNumber(totals.credit);
+      }
+      const totalsSum = totals.pix + totals.debit + totals.credit;
+
+      // Agora taxas lidas com nRate
+      const rates = {
+        d0: { pix: nRate(el('d0Pix').value) / 100, debit: nRate(el('d0Debit').value) / 100, credit: nRate(el('d0Credit').value) / 100 },
+        d1: { pix: nRate(el('d1Pix').value) / 100, debit: nRate(el('d1Debit').value) / 100, credit: nRate(el('d1Credit').value) / 100 }
+      };
+
+      // Validations / checks
+      const checks = [];
+      if (countsSum !== totalCount) {
+        const cls = Math.abs(countsSum - totalCount) > 0 ? 'warn' : 'ok';
+        checks.push(`<span class="pill ${cls}">Contagem: soma por método = <b>${countsSum}</b> vs total = <b>${totalCount}</b></span>`);
+      } else {
+        checks.push(`<span class="pill ok">Contagem OK</span>`);
+      }
+      if (Math.abs(totalsSum - totalGross) > 0.01) {
+        const diff = totalsSum - totalGross;
+        const state = Math.abs(diff) > 1 ? 'warn' : 'ok';
+        const sign = diff > 0 ? '+' : '';
+        checks.push(`<span class="pill ${state}">Valores por método somam ${sign}${money(diff)} em relação ao total</span>`);
+      } else {
+        checks.push(`<span class="pill ok">Valores (R$) OK</span>`);
+      }
+      document.getElementById('checks').innerHTML = checks.join('');
+
+      const scenarios = {
+        'D+0 (Imediato)': rates.d0,
+        'D+1 (1 dia útil)': rates.d1
+      };
+
+      const cards = [];
+      for (const [name, r] of Object.entries(scenarios)) {
+        const rows = [
+          calcRow('PIX', totals.pix, r.pix),
+          calcRow('Débito', totals.debit, r.debit),
+          calcRow('Crédito à vista', totals.credit, r.credit)
+        ];
+        const totalFee = rows.reduce((s, x) => s + x.fee, 0);
+        const totalNet = rows.reduce((s, x) => s + x.net, 0);
+
+        cards.push(`
+          <div class="card" style="margin-bottom:12px;">
+            <h2>${name}</h2>
+            <div class="body">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Valor Bruto</th>
+                    <th>Taxa %</th>
+                    <th>Taxa (R$)</th>
+                    <th>Valor Líquido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map(r => `
+                    <tr>
+                      <td>${r.label}</td>
+                      <td>${money(r.gross)}</td>
+                      <td>${pct(r.rate * 100)}</td>
+                      <td>${money(r.fee)}</td>
+                      <td>${money(r.net)}</td>
+                    </tr>`).join('')}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total</td>
+                    <td>${money(totalsSum)}</td>
+                    <td></td>
+                    <td>${money(totalFee)}</td>
+                    <td>${money(totalNet)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        `);
+      }
+      document.getElementById('tables').innerHTML = cards.join('');
+
+      const diff = (n) => Math.abs(n) < 0.005 ? 0 : n; // avoid -0,00
+      const best = totalGross - Math.min(...Object.values(scenarios).map(s =>
+        totals.pix * (s.pix) + totals.debit * (s.debit) + totals.credit * (s.credit)
+      ));
+      const summary = `
+        <span class="pill">Ticket médio <b>${money(totalCount ? totalGross / totalCount : 0)}</b></span>
+        <span class="pill">Faturamento <b>${money(totalGross)}</b></span>
+        <span class="pill">Melhor cenário rende + <b>${money(diff(best))}</b></span>
+      `;
+      document.getElementById('summary').innerHTML = summary;
+    }
+
+    function calcRow(label, gross, rate) {
+      const fee = gross * (rate || 0);
+      const net = gross - fee;
+      return { label, gross, rate, fee, net };
+    }
+
+    function formatNumber(v) {
+      try {
+        const parts = (new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).formatToParts(v);
+        return parts.map(p => p.type === 'currency' ? '' : p.value).join('');
+      } catch {
+        return String(v);
+      }
+    }
+
+    // init
+    compute();
+  </script>
+</body>
+
+</html>
